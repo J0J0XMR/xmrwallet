@@ -125,6 +125,8 @@ public class Wallet {
     }
 
     public native String getSeed(String offset);
+    public native String getLegacySeed(String offset);
+    public native boolean isPolyseedSupported(String offset);
 
     public native String getSeedLanguage();
 
