@@ -89,6 +89,7 @@ public class GenerateReviewFragment extends Fragment {
     private LinearLayout llMnemonic;
     private LinearLayout llSpendKey;
     private LinearLayout llViewKey;
+    private LinearLayout llHeight;
     private Button bAdvancedInfo;
     private Button bAccept;
 
@@ -121,6 +122,7 @@ public class GenerateReviewFragment extends Fragment {
         llMnemonic = view.findViewById(R.id.llMnemonic);
         llSpendKey = view.findViewById(R.id.llSpendKey);
         llViewKey = view.findViewById(R.id.llViewKey);
+        llHeight = view.findViewById(R.id.llHeight);
 
         etSeedOffset = view.findViewById(R.id.etSeedOffset);
         bSeedOffset = view.findViewById(R.id.bSeedOffset);
@@ -161,12 +163,18 @@ public class GenerateReviewFragment extends Fragment {
         walletPath = args.getString(REQUEST_PATH);
         localPassword = args.getString(REQUEST_PASSWORD);
         showDetails();
+        changeHeightVisibility();
 
         tvWalletMnemonic.setOnClickListener(view1 -> {
             fLegacySeed = !fLegacySeed;
+            changeHeightVisibility();
             showSeed();
         });
         return view;
+    }
+
+    private void changeHeightVisibility() {
+        llHeight.setVisibility(fLegacySeed ? View.VISIBLE : View.GONE);
     }
 
     String getSeedOffset() {
