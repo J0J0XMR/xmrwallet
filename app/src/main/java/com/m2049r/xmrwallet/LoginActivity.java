@@ -919,7 +919,7 @@ public class LoginActivity extends BaseActivity
                         final long restoreHeight =
                                 (currentNode != null) ? currentNode.getHeight() : -1;
                         Wallet newWallet = WalletManager.getInstance()
-                                .createWallet(aFile, password, MNEMONIC_LANGUAGE, restoreHeight);
+                                .createWalletPolyseed(aFile, password, password,MNEMONIC_LANGUAGE);
                         return checkAndCloseWallet(newWallet);
                     }
                 });
@@ -940,6 +940,25 @@ public class LoginActivity extends BaseActivity
                     public boolean createWallet(File aFile, String password) {
                         Wallet newWallet = WalletManager.getInstance()
                                 .recoveryWallet(aFile, password, seed, offset, restoreHeight);
+                        return checkAndCloseWallet(newWallet);
+                    }
+                });
+    }
+
+    @Override
+    public void onGenerate(final String name, final String password,
+                           final String polyseed, final String offset) {
+        createWallet(name, password,
+                new WalletCreator() {
+                    @Override
+                    public boolean isLedger() {
+                        return false;
+                    }
+
+                    @Override
+                    public boolean createWallet(File aFile, String password) {
+                        Wallet newWallet = WalletManager.getInstance()
+                                .recoveryWalletPolyseed(aFile, password, polyseed, offset);
                         return checkAndCloseWallet(newWallet);
                     }
                 });

@@ -33,6 +33,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
@@ -42,6 +43,7 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.m2049r.xmrwallet.model.NetworkType;
 import com.m2049r.xmrwallet.model.Wallet;
@@ -84,6 +86,10 @@ public class GenerateFragment extends Fragment {
 
     private String type = null;
 
+    private SwitchMaterial swPolyseed;
+    private boolean isPolyseedMode = false;
+    private View llLegacyPolyseed;
+
     private void clearErrorOnTextEntry(final TextInputLayout textInputLayout) {
         textInputLayout.getEditText().addTextChangedListener(new TextWatcher() {
             @Override
@@ -110,10 +116,17 @@ public class GenerateFragment extends Fragment {
 
         View view = inflater.inflate(R.layout.fragment_generate, container, false);
 
+        swPolyseed = view.findViewById(R.id.swPolyseed);
+        llLegacyPolyseed = view.findViewById(R.id.llLegacyPolyseed);
+
         etWalletName = view.findViewById(R.id.etWalletName);
         etWalletPassword = view.findViewById(R.id.etWalletPassword);
         llFingerprintAuth = view.findViewById(R.id.llFingerprintAuth);
         etWalletMnemonic = view.findViewById(R.id.etWalletMnemonic);
+
+        etWalletMnemonic.setHint(isPolyseedMode?R.string._16_word_mnemonic_seed:R.string.generate_mnemonic_hint);
+        swPolyseed.setChecked(isPolyseedMode);
+
         etWalletAddress = view.findViewById(R.id.etWalletAddress);
         etWalletViewKey = view.findViewById(R.id.etWalletViewKey);
         etWalletSpendKey = view.findViewById(R.id.etWalletSpendKey);
@@ -214,6 +227,7 @@ public class GenerateFragment extends Fragment {
                     }
                     return false;
                 });
+                llLegacyPolyseed.setVisibility(View.VISIBLE);
                 etWalletMnemonic.setVisibility(View.VISIBLE);
                 etWalletMnemonic.getEditText().setOnEditorActionListener((v, actionId, event) -> {
                     if ((event != null && (event.getKeyCode() == KeyEvent.KEYCODE_ENTER) && (event.getAction() == KeyEvent.ACTION_DOWN))
@@ -280,12 +294,27 @@ public class GenerateFragment extends Fragment {
             });
         }
         if (!type.equals(TYPE_NEW)) {
-            etWalletRestoreHeight.setVisibility(View.VISIBLE);
+            etWalletRestoreHeight.setVisibility(isPolyseedMode ? View.GONE : View.VISIBLE);
             etWalletRestoreHeight.getEditText().setImeOptions(EditorInfo.IME_ACTION_UNSPECIFIED);
         }
         bGenerate.setOnClickListener(v -> {
             Helper.hideKeyboard(getActivity());
             generateWallet();
+        });
+        swPolyseed.setOnCheckedChangeListener( (compoundButton, isChecked) -> {
+            // Perform actions based on switch state
+            if (isChecked) {
+                // Switch is ON
+                isPolyseedMode = true;
+                etWalletRestoreHeight.setVisibility(View.GONE);
+                etWalletMnemonic.setHint(R.string._16_word_mnemonic_seed);
+            } else {
+                // Switch is OFF
+                isPolyseedMode = false;
+                etWalletRestoreHeight.setVisibility(View.VISIBLE);
+                etWalletMnemonic.setHint(R.string.generate_mnemonic_hint);
+            }
+            checkMnemonic();
         });
 
         etWalletName.requestFocus();
@@ -328,6 +357,7 @@ public class GenerateFragment extends Fragment {
     }
 
     private boolean checkHeight() {
+        if(isPolyseedMode) return true;
         long height = !type.equals(TYPE_NEW) ? getHeight() : 0;
         boolean ok = true;
         if (height < 0) {
@@ -375,13 +405,22 @@ public class GenerateFragment extends Fragment {
 
     private boolean checkMnemonic() {
         String seed = etWalletMnemonic.getEditText().getText().toString();
-        boolean ok = (seed.split("\\s").length == 25); // 25 words
-        if (!ok) {
-            etWalletMnemonic.setError(getString(R.string.generate_check_mnemonic));
+        int num_words = seed.split("\\s").length;
+        if(isPolyseedMode) {
+            if (num_words == 16) {
+                etWalletMnemonic.setError(null);
+            } else {
+                etWalletMnemonic.setError(getString(R.string._16_polyseed_check_mnemonic));
+            }
+            return num_words == 16;
         } else {
-            etWalletMnemonic.setError(null);
+            if (num_words == 25) {
+                etWalletMnemonic.setError(null);
+            } else {
+                etWalletMnemonic.setError(getString(R.string.generate_check_mnemonic));
+            }
+            return num_words == 25;
         }
-        return ok;
     }
 
     private boolean checkAddress() {
@@ -447,7 +486,11 @@ public class GenerateFragment extends Fragment {
                     KeyStoreHelper.saveWalletUserPass(requireActivity(), name, password);
                 }
                 final String offset = etSeedOffset.getEditText().getText().toString();
-                activityCallback.onGenerate(name, crazyPass, seed, offset, height);
+                if (isPolyseedMode) {
+                    activityCallback.onGenerate(name, crazyPass, seed, offset);
+                } else {
+                    activityCallback.onGenerate(name, crazyPass, seed, offset, height);
+                }
                 break;
             case TYPE_LEDGER:
                 bGenerate.setEnabled(false);
@@ -512,6 +555,8 @@ public class GenerateFragment extends Fragment {
         void onGenerate(String name, String password);
 
         void onGenerate(String name, String password, String seed, String offset, long height);
+
+        void onGenerate(String name, String password, String seed, String offset);
 
         void onGenerate(String name, String password, String address, String viewKey, String spendKey, long height);
 

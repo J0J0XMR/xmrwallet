@@ -97,6 +97,7 @@ public class GenerateReviewFragment extends Fragment {
 
     private String walletPath;
     private String walletName;
+    private boolean fLegacySeed = true;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -160,6 +161,11 @@ public class GenerateReviewFragment extends Fragment {
         walletPath = args.getString(REQUEST_PATH);
         localPassword = args.getString(REQUEST_PASSWORD);
         showDetails();
+
+        tvWalletMnemonic.setOnClickListener(view1 -> {
+            fLegacySeed = !fLegacySeed;
+            showSeed();
+        });
         return view;
     }
 
@@ -273,7 +279,7 @@ public class GenerateReviewFragment extends Fragment {
 
             address = wallet.getAddress();
             height = wallet.getRestoreHeight();
-            seed = wallet.getSeed(getSeedOffset());
+            seed = fLegacySeed ? wallet.getLegacySeed(getSeedOffset()) : wallet.getSeed(getSeedOffset());
             switch (wallet.getDeviceType()) {
                 case Device_Ledger:
                     viewKey = Ledger.Key();
@@ -684,7 +690,7 @@ public class GenerateReviewFragment extends Fragment {
                 return false;
             }
 
-            seed = wallet.getSeed(offset);
+            seed = fLegacySeed ? wallet.getLegacySeed(offset) : wallet.getSeed(offset);
             if (closeWallet) wallet.close();
             return true;
         }

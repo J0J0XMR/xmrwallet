@@ -85,7 +85,6 @@
                 style="@style/MoneroEdit"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/generate_mnemonic_hint"
                 android:imeOptions="actionNext"
                 android:inputType="textMultiLine|textVisiblePassword"
                 android:textAlignment="textStart" />
@@ -209,6 +208,28 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/header_top_first"
             android:text="@string/generate_buttonGenerate" />
+
+        <LinearLayout
+            android:id="@+id/llLegacyPolyseed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingTop="32dp"
+            android:visibility="visible">
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swPolyseed"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical"
+                android:text="Restore from Polyseed"
+                android:textSize="18sp" />
+        </LinearLayout>
 
     </LinearLayout>
 </ScrollView>

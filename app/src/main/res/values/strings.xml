@@ -213,6 +213,7 @@
     <string name="generate_check_key">Enter valid Key</string>
     <string name="generate_check_address">Enter valid Address</string>
     <string name="generate_check_mnemonic">Enter your 25 word seed</string>
+    <string name="_16_polyseed_check_mnemonic">Enter your 16 word seed</string>
 
     <string name="send_notes_hint">Private Notes (optional)</string>
     <string name="send_generate_paymentid_hint">Generate</string>
@@ -288,7 +289,7 @@
     <string name="fab_create_new">Create new wallet</string>
     <string name="fab_restore_viewonly">Restore view-only wallet</string>
     <string name="fab_restore_key">Restore wallet from private keys</string>
-    <string name="fab_restore_seed">Restore wallet 25 word seed</string>
+    <string name="fab_restore_seed">Restore wallet from seed words</string>
 
     <string name="accounts_balance" translatable="false">%1$s XMR</string>
     <string name="tx_account_formatted" translatable="false">(%1$d, %2$d) &nbsp;&lt;span style=\"background-color: #%3$s; color: #%4$s;\"&gt;&nbsp;%5$s&nbsp;&lt;/span&gt;</string>
@@ -498,4 +499,5 @@
     <string name="pocketchange_create_title">Create Change</string>
 
     <string name="label_apply">APPLY</string>
+    <string name="_16_word_mnemonic_seed">16-Word Mnemonic Seed</string>
 </resources>
